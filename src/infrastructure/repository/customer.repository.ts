@@ -1,12 +1,12 @@
 import Address from "../../domain/entity/address";
 import Customer from "../../domain/entity/customer";
-import RepositoryInterface from "../../domain/repositoy/repository.interface";
+import CustomerRepositoryInterface from "../../domain/repositoy/customer-repository.interface";
 import CustomerModel from "../db/sequelize/model/customer.model";
 
-export default class CustomerRepository implements RepositoryInterface<Customer> {
+export default class CustomerRepository implements CustomerRepositoryInterface {
   async create(entity: Customer): Promise<void> {
     await CustomerModel.create({
-      id: entity.customerId,
+      id: entity.customer_id,
       name: entity.name,
       street: entity.Address.street,
       number: entity.Address.number,
@@ -28,10 +28,11 @@ export default class CustomerRepository implements RepositoryInterface<Customer>
       rewardPoints: entity.rewardPoints,
     }, {
       where: {
-        id: entity.customerId
+        id: entity.customer_id
       }
     });
   }
+
   async find(id: string): Promise<Customer> {
     let customer;
     try {
@@ -51,6 +52,7 @@ export default class CustomerRepository implements RepositoryInterface<Customer>
     else { result.desactivate(); }
     return result;
   }
+
   async findAll(): Promise<Customer[]> {
     const customersModel = await CustomerModel.findAll();
 
@@ -69,6 +71,52 @@ export default class CustomerRepository implements RepositoryInterface<Customer>
       return customer;
     });
     return customers;
+  }
+
+  async addRewardPoints(customer_id: string, points: number): Promise<void> {
+    let customer;
+    try {
+      customer = await CustomerModel.findOne({
+        where: { id: customer_id },
+        rejectOnEmpty: true,
+      });
+    } catch (error) {
+      throw new Error("Customer not found");
+    }
+
+    const totalPoints = customer.rewardPoints + points;
+    await CustomerModel.update({
+      rewardPoints: totalPoints,
+    }, {
+      where: {
+        id: customer_id
+      }
+    });
+  }
+
+  async removeRewardPoints(customer_id: string, points: number): Promise<void> {
+    let customer;
+    try {
+      customer = await CustomerModel.findOne({
+        where: { id: customer_id },
+        rejectOnEmpty: true,
+      });
+    } catch (error) {
+      throw new Error("Customer not found");
+    }
+
+    if (customer.rewardPoints < points) {
+      points = customer.rewardPoints;
+    }
+
+    const totalPoints = customer.rewardPoints - points;
+    await CustomerModel.update({
+      rewardPoints: totalPoints,
+    }, {
+      where: {
+        id: customer_id
+      }
+    });
   }
 
 }

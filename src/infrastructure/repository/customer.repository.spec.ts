@@ -81,7 +81,7 @@ describe("Customer repository test", () => {
     }).rejects.toThrow("Customer not found");
   });
 
-  it("should find all customers", async () => {
+  it("Should find all customers", async () => {
     const customerRepository = new CustomerRepository();
     const customer1 = new Customer("123", "Customer 1");
     const address1 = new Address("Street 1", 1, "Zipcode 1", "City 1");
@@ -104,4 +104,64 @@ describe("Customer repository test", () => {
     expect(customers).toContainEqual(customer2);
   });
 
+  it("Should add reward points", async () => {
+    const customerRepository = new CustomerRepository();
+    const customer = new Customer("123", "Customer 1");
+    const address1 = new Address("Street 1", 1, "Zipcode 1", "City 1");
+    customer.address = address1;
+    customer.addRewardPoints(10);
+    customer.activate();
+    await customerRepository.create(customer);
+
+    const customerFound = await customerRepository.find("123");
+
+    expect(customerFound.rewardPoints).toEqual(10);
+
+    await customerRepository.addRewardPoints("123", 15);
+
+    const customerFound2 = await customerRepository.find("123");
+
+    expect(customerFound2.rewardPoints).toEqual(25);
+  });
+
+  it("Should remove reward points", async () => {
+    const customerRepository = new CustomerRepository();
+    const customer = new Customer("123", "Customer 1");
+    const address1 = new Address("Street 1", 1, "Zipcode 1", "City 1");
+    customer.address = address1;
+    customer.addRewardPoints(50);
+    customer.activate();
+    await customerRepository.create(customer);
+
+    const customerFound = await customerRepository.find("123");
+
+    expect(customerFound.rewardPoints).toEqual(50);
+
+    await customerRepository.removeRewardPoints("123", 15);
+
+    const customerFound2 = await customerRepository.find("123");
+
+    expect(customerFound2.rewardPoints).toEqual(35);
+  });
+
+  it("Should throw error when remove reward points less than 0", async () => {
+    const customerRepository = new CustomerRepository();
+    const customer = new Customer("123", "Customer 1");
+    const address1 = new Address("Street 1", 1, "Zipcode 1", "City 1");
+    customer.address = address1;
+    customer.addRewardPoints(10);
+    customer.activate();
+    await customerRepository.create(customer);
+
+    let customerFound;
+    customerFound = await customerRepository.find("123");
+
+    expect(customerFound.rewardPoints).toEqual(10);
+
+    await customerRepository.removeRewardPoints("123", 15);
+
+    customerFound = await customerRepository.find("123");
+
+    expect(customerFound.rewardPoints).toEqual(0);
+  });
 });

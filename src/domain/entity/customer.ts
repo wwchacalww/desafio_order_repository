@@ -15,7 +15,7 @@ export default class Customer {
     this.validate();
   }
 
-  get customerId(): string {
+  get customer_id(): string {
     return this._id;
   }
 
@@ -73,4 +73,7 @@ export default class Customer {
     this._rewardPoints += points;
   }
 
+  removeRewardPoints(points: number) {
+    this._rewardPoints -= points;
+  }
 }

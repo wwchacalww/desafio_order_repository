@@ -13,17 +13,17 @@ describe("Order unit tests", () => {
     }).toThrowError("Id is required");
   });
 
-  it("Should throw error when customerId is empty", () => {
+  it("Should throw error when customer_id is empty", () => {
     expect(() => {
       let customer = new Customer("123", "Fulando de Tal");
       const item1 = new OrderItem("123", "Item1", 10, "Prod1", 2);
 
       const order = new Order("123", "", [item1]);
 
-    }).toThrowError("customerId is required");
+    }).toThrowError("customer_id is required");
   });
 
-  it("Should throw error when customerId is empty", () => {
+  it("Should throw error when customer_id is empty", () => {
     expect(() => {
       let customer = new Customer("123", "Fulando de Tal");
 
